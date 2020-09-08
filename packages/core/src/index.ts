@@ -141,11 +141,20 @@ export function getAnchorClassName<T>(data: TreeData<T>, hovered: boolean, path:
  */
 export function getCheckboxClassName<T>(data: TreeData<T>, path: number[]) {
   const values = ['tree-icon', 'tree-checkbox', `tree-checkbox-${path.join('-')}`]
-  if (data.children
-    && data.children.some(child => child.state.selected)
-    && data.children.some(child => !child.state.selected)) {
-    values.push('tree-undetermined')
+  const fnIsUndetermined = (data: TreeData<T>) => {
+    if (data.children
+      && data.children.some(child => child.state.selected)
+      && data.children.some(child => !child.state.selected)) {
+      return true
+    }
+    for (const d of data.children || []) {
+      if(fnIsUndetermined(d)){
+        return true
+      }
+    }
+    return false
   }
+  fnIsUndetermined(data) && values.push('tree-undetermined')
   return values.join(' ')
 }
 
